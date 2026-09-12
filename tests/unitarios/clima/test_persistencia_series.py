@@ -146,6 +146,37 @@ def test_orden_de_salida_es_determinista(
     assert filas[1]["codigo_divipola"] == "17174"
 
 
+def test_gzip_es_reproducible_byte_a_byte(
+    tmp_path: Path,
+) -> None:
+    observaciones = [
+        _observacion(
+            codigo_divipola="17001",
+            fecha_hora=datetime(2026, 9, 1, 12),
+        ),
+        _observacion(
+            codigo_divipola="17174",
+            fecha_hora=datetime(2026, 9, 1, 13),
+        ),
+    ]
+
+    resultado_a = persistir_series_territoriales_horarias(
+        observaciones,
+        directorio=tmp_path / "a",
+        nombre_base="serie",
+    )
+
+    resultado_b = persistir_series_territoriales_horarias(
+        reversed(observaciones),
+        directorio=tmp_path / "b",
+        nombre_base="serie",
+    )
+
+    assert resultado_a.ruta_datos.read_bytes() == resultado_b.ruta_datos.read_bytes()
+
+    assert resultado_a.sha256 == resultado_b.sha256
+
+
 def test_permite_serie_vacia(
     tmp_path: Path,
 ) -> None:
