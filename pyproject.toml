@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=80.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vigia-mercados"
+version = "0.1.0"
+description = "Sistema autónomo de vigilancia y análisis de mercados mayoristas colombianos."
+readme = "README.md"
+requires-python = ">=3.14,<3.15"
+authors = [
+    { name = "Proyecto VIGÍA" }
+]
+dependencies = []
+
+[project.optional-dependencies]
+desarrollo = [
+    "mypy==2.3.1",
+    "pytest==9.1.1",
+    "ruff==0.16.7"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-config",
+    "--strict-markers"
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "B",
+    "UP",
+    "SIM",
+    "RUF"
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+warn_unused_configs = true
+show_error_codes = true
+pretty = true
+files = [
+    "src",
+    "tests"
+]
