@@ -23,29 +23,6 @@ El proyecto sigue cuatro principios fundamentales:
 3. Toda alerta debe ser trazable hasta sus datos y algoritmos de origen.
 4. Ningún componente externo se considera confiable sin validación.
 
-## Estado
-
-### H0 — Fundación
-
-Objetivos:
-
-- entorno reproducible;
-- Python 3.14;
-- pruebas automatizadas;
-- análisis estático;
-- tipado estático;
-- integración continua.
-
-No forman parte todavía de H0:
-
-- SIPSA;
-- IDEAM;
-- LangChain;
-- LangGraph;
-- Groq;
-- Streamlit;
-- modelos predictivos.
-
 ## Desarrollo
 
 Instalar el proyecto:
