@@ -1,4 +1,3 @@
-cat > README.md <<'EOF'
 # VIGÍA Mercados
 
 Sistema autónomo de vigilancia y análisis de mercados mayoristas colombianos basado en datos públicos, ciencia de datos y agentes de inteligencia artificial.
