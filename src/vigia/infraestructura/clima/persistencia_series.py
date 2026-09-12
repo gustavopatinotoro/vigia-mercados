@@ -1,9 +1,9 @@
 """
 Persistencia reproducible de series climáticas territoriales horarias.
 
-Los datos se almacenan en CSV comprimido con gzip y se acompañan de un
-manifiesto JSON que conserva metadatos operativos y la huella SHA-256
-del artefacto generado.
+Los datos se almacenan en CSV comprimido con gzip determinista y se
+acompañan de un manifiesto JSON que conserva metadatos operativos y la
+huella SHA-256 del artefacto generado.
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ from __future__ import annotations
 import csv
 import gzip
 import hashlib
+import io
 import json
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -41,8 +42,8 @@ def persistir_series_territoriales_horarias(
     """
     Persiste una serie territorial horaria y genera su manifiesto.
 
-    La salida es determinista respecto al orden lógico de las
-    observaciones recibidas.
+    El artefacto gzip es determinista: para el mismo contenido lógico
+    debe producir exactamente los mismos bytes y el mismo SHA-256.
     """
     if not nombre_base.strip():
         raise ValueError("nombre_base no puede estar vacío.")
@@ -69,7 +70,7 @@ def persistir_series_territoriales_horarias(
     ruta_datos = directorio / f"{nombre_base}.csv.gz"
     ruta_manifiesto = directorio / f"{nombre_base}.json"
 
-    _escribir_csv(
+    _escribir_csv_determinista(
         ruta=ruta_datos,
         observaciones=registros,
     )
@@ -92,20 +93,33 @@ def persistir_series_territoriales_horarias(
     )
 
 
-def _escribir_csv(
+def _escribir_csv_determinista(
     *,
     ruta: Path,
     observaciones: tuple[ObservacionClimaticaTerritorialHoraria, ...],
 ) -> None:
-    """Escribe el artefacto climático comprimido."""
-    with gzip.open(
-        ruta,
-        mode="wt",
-        encoding="utf-8",
-        newline="",
-    ) as archivo:
+    """
+    Escribe CSV gzip de forma determinista.
+
+    mtime=0 evita que la fecha de generación modifique los bytes del gzip.
+    filename="" evita incorporar el nombre físico del archivo en su cabecera.
+    """
+    with (
+        ruta.open("wb") as archivo_binario,
+        gzip.GzipFile(
+            filename="",
+            mode="wb",
+            fileobj=archivo_binario,
+            mtime=0,
+        ) as archivo_gzip,
+        io.TextIOWrapper(
+            archivo_gzip,
+            encoding="utf-8",
+            newline="",
+        ) as archivo_texto,
+    ):
         escritor = csv.writer(
-            archivo,
+            archivo_texto,
             lineterminator="\n",
         )
 
